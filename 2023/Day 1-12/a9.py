@@ -1,50 +1,36 @@
-def find_last(A):
-    diff_list = []
-    for i in range(1,len(A)):
-        diff_list.append(A[i]-A[i-1])
-    last_element = diff_list[-1]
-    if sum(diff_list)!=0:
-        last_element = find_last(diff_list)
-    return last_element + A[-1]
+def interp(A):
+    diff_list = [A[i]-A[i-1] for i in range(1,len(A))]
+    if not all(x == 0 for x in diff_list):
+        interp(diff_list)
+    A.append(diff_list[-1]+A[-1])
 
-def find_first(A):
-    diff_list = []
-    for i in range(1,len(A)):
-        diff_list.append(A[i]-A[i-1])
-    first_element = diff_list[0]
-    if sum(diff_list)!=0:
-        first_element = find_first(diff_list)
-    return  A[0] - first_element
+def interp_backwards(A):
+    diff_list = [A[i]-A[i-1] for i in range(1,len(A))]
+    if not all(x == 0 for x in diff_list):
+        interp_backwards(diff_list)
+    A.insert(0,A[0]-diff_list[0])
 
-def p1():
+def main():
+    A = []
     with open('2023/data/a9.txt', 'r', encoding='UTF-8') as file:
-        sum = 0
-        A = []
-        for s in file:
-            A.append(s.strip("\n"))
-        for i, a in enumerate(A):
-            array = a.split(" ")
-            int_A = []
-            for s in array:
-                int_A.append((int)(s))
-            A[i] = int_A
-            sum += find_last(A[i])
-        print(sum)
+        A = [line.strip() for line in file]
+    series = []
+    for s in A:
+        series.append([int(x) for x in s.split(" ")])
 
-def p2():
-    with open('2023/data/a9.txt', 'r', encoding='UTF-8') as file:
-        sum = 0
-        A = []
-        for s in file:
-            A.append(s.strip("\n"))
-        for i, a in enumerate(A):
-            array = a.split(" ")
-            int_A = []
-            for s in array:
-                int_A.append((int)(s))
-            A[i] = int_A
-            sum += find_first(A[i])
-        print(sum)
+    total = 0
+    for serie in series:
+        interp(serie)
+        total += serie[-1]
+        serie.pop()
+    print(total)
 
-p1()
-p2()
+    ### Part 2
+    total = 0
+    for serie in series:
+        interp_backwards(serie)
+        total += serie[0]
+    print(total)
+
+if __name__ == '__main__':
+    main()

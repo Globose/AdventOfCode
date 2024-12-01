@@ -1,172 +1,90 @@
+V = [{'7':(-1,0,1), '|':(0,-1,0), 'F': (1,0,2)}, {'F':(0,1,3), '-':(-1,0,1), 'L': (0,-1,0)},
+     {'7':(0,1,3), '-':(1,0,2), 'J': (0,-1,0)}, {'J':(-1,0,1), '|':(0,-1,3), 'L': (1,0,2)}]
 
-def p1():
+S = [('7','|','F'), ('7','F','L'), ('J','7','-'), ('|','L','J')]
+S1 = [(0,-1), (-1,0), (1,0), (0,1)]
+
+sym = {'F':'....F-.|.', '7':'...-7..|.', 'L':'.|..L-...','J':'.|.-J....','|':'.|..|..|.', '-':'...---...', '.':'.........', 'S':'...-S-...'}
+s_help = [(1,'|'), (3,'-'), (5,'-'), (7,'|')]
+
+def part_2(A, start_pos, main_loop):
+    ### Expand map
+    new_map = []
+    added_dots = 0
+    total_dots = 0
+    for y in range(len(A)):
+        B = ['', '', '']
+        for x in range(len(A[0])):
+            key = A[y][x] if (x,y) in main_loop else '.'
+            for i in range(3):
+                B[i] += sym[key][i*3:i*3+3]
+            added_dots += sym[key].count('.')-key.count('.')
+            total_dots += sym[key].count('.')
+        new_map.extend(B)
+
+    ### Try to visit all dots
+    visited = set()
+    visited_A = set()
+    visit_list = {start_pos}
+    while len(visit_list) > 0:
+        node = visit_list.pop()
+        visited.add(node)
+        for i in range(4):
+            pos = ((node[0]+S1[i][0],node[1]+S1[i][1]))
+            if pos in visited or pos[0] < 0 or pos[0] >= len(new_map[0]):
+                continue
+            if pos[1] < 0 or pos[1] >= len(new_map):
+                continue
+            if new_map[pos[1]][pos[0]] == '.':
+                visit_list.add(pos)
+                visited_A.add((pos[0]//3, pos[1]//3))
+    
+    ### Count not visited
+    counter = 0
+    for y, row in enumerate(A):
+        for x, cell in enumerate(row):
+            if (x,y) not in visited_A:
+                counter += 1
+    print(counter)
+
+def main():
+    A = []
+    main_loop = set()
     with open('2023/data/a10.txt', 'r', encoding='UTF-8') as file:
-        sum = 0
-        A = []
-        for s in file:
-            A.append(s.strip("\n"))
-        pos = (0,0)
-        for y, line in enumerate(A):
-            for x, char in enumerate(line):
-                if char == 'S':
-                    pos = (x,y)
-                    break
-        # print(pos)
-        dir = (1,0)
-        pos = (pos[0]+1,pos[1])
-        current = A[pos[1]][pos[0]]
-        counter = 1
-        while current != 'S':
-            counter += 1
-            print(current, pos, dir)
-            if current == 'J':
-                if dir[0] == 1:
-                    dir = (0,-1)
-                else:
-                    dir = (-1,0)
-            elif current == 'F':
-                if dir[0] == -1:
-                    dir = (0,1)
-                else:
-                    dir = (1,0)
-            elif current == '7':
-                if dir[0] == 1:
-                    dir = (0, 1)
-                else:
-                    dir = (-1,0)
-            elif current == 'L':
-                if dir[0] == -1:
-                    dir = (0,-1)
-                else:
-                    dir = (1,0)
-            elif current == '-':
-                dir = (dir[0], 0)
-            elif current == '|':
-                dir = (0, dir[1])
+        A = [line.strip() for line in file]
 
-            pos = (pos[0]+dir[0], pos[1]+dir[1])
-            current = A[pos[1]][pos[0]]
-        print((int)(counter/2))
+    ### Find startpoint
+    pos = (0,0)
+    dir = 0
+    start_pos = (0,0)
+    for y, line in enumerate(A):
+        for x, char in enumerate(line):
+            if char == 'S':
+                start_pos = (x,y)
+                s_symbol = ['.','.','.','.','S','.','.','.','.']
+                for i in range(4):
+                    if A[y+S1[i][1]][x+S1[i][0]] in S[i]: 
+                        dir = i
+                        s_symbol[s_help[i][0]] = s_help[i][1]
+                sym['S'] = "".join(s_symbol)
+                break
+    
+    pipe_len = 0
+    pos = start_pos
+    
+    while True:
+        pipe_len += 1
+        main_loop.add(pos)
+        pos = (pos[0]+S1[dir][0], pos[1]+S1[dir][1])
+        if pos == start_pos:
+            break
+        vec = V[dir].get(A[pos[1]][pos[0]])
+        dir = vec[2]
 
-def p2():
-    with open('2023/data/a10.txt', 'r', encoding='UTF-8') as file:
-        sum = 0
-        A = []
-        for s in file:
-            A.append(s.strip("\n"))
-        pos = (0,0)
-        pipes = {}
-        for y, line in enumerate(A):
-            for x, char in enumerate(line):
-                pipes[(x,y)]=A[y][x]
-                if char == 'S':
-                    pos = (x,y)
-                    pipes[pos] = 'S'
-        nmap = {}
-        addeddots = 0
-        sym = {'F':'....F-.|.', '7':'...-7..|.', 'L':'.|..L-...','J':'.|.-J....','|':'.|..|..|.', '-':'...---...', 'S':'...-S-...', '.':'.........'}
-        for y in range(len(A)):
-            for x in range(len(A[0])):
-                c = 0
-                key = pipes[(x,y)]
-                for s in sym[key]:
-                    nmap[(x*3+c%3,y*3+c//3)] = sym[key][c]
-                    c+=1
-                    if sym[key] == '.':
-                        addeddots += 8
-                    else:
-                        addeddots += sym[key].count('.')
+    print(pipe_len//2)
 
-        D = []
-        for y in range(3*len(A)):
-            newline = ""
-            for x in range(3*len(A[0])):
-                newline += nmap[(x,y)]
-                if nmap[(x,y)] == 'S':
-                    pos = (x,y)
-            D.append(newline)
+    ### Part 2
+    part_2(A, start_pos, main_loop)
 
-        line = {}
-        line[pos] = True
-        dir = (1,0)
-        pos = (pos[0]+dir[0],pos[1])
-        current = D[pos[1]][pos[0]]
-        while current != 'S':
-            line[pos] = True
-            nmap[pos] = current
-            if current == 'J':
-                if dir[0] == 1:
-                    dir = (0,-1)
-                else:
-                    dir = (-1,0)
-            elif current == 'F':
-                if dir[0] == -1:
-                    dir = (0,1)
-                else:
-                    dir = (1,0)
-            elif current == '7':
-                if dir[0] == 1:
-                    dir = (0, 1)
-                else:
-                    dir = (-1,0)
-            elif current == 'L':
-                if dir[0] == -1:
-                    dir = (0,-1)
-                else:
-                    dir = (1,0)
-            elif current == '-':
-                dir = (dir[0], 0)
-            elif current == '|':
-                dir = (0, dir[1])
-
-            pos = (pos[0]+dir[0], pos[1]+dir[1])
-            current = D[pos[1]][pos[0]]
-
-        changed = []
-        for y in range(len(D)):
-            if not line.get((0,y)):
-                nmap[(0,y)] = 0
-                changed.append((0,y))
-            if not line.get((len(D[0])-1,y)):
-                nmap[(len(D[0])-1,y)] = 0
-                changed.append((len(D[0])-1,y))
-        for x in range(len(D[0])):
-            if not line.get((x,0)):
-                nmap[(x,0)] = 0
-                changed.append((x,0))
-            if not line.get((x,len(D)-1)):
-                nmap[(x,len(D)-1)] = 0
-                changed.append((x,len(D)-1))
-
-        nlist = [(-1,-1),(0,-1), (1,-1), (-1,0), (1,0), (-1,1), (0,1), (1,1)]
-        while len(changed) > 0:
-            for cpos in changed.copy():
-                for n in nlist:
-                    npos = (cpos[0]+n[0], cpos[1]+n[1])
-                    if npos[0] >= len(D[0]) or npos[0] < 0 or npos[1] >= len(D) or npos[1] < 0:
-                        continue
-                    if line.get(npos) is None and nmap.get(npos) != 0:
-                        nmap[npos] = 0
-                        changed.append(npos)
-                changed.remove(cpos)
-
-        for y in range(len(D)):
-            for x in range(len(D[0])):
-                if line.get((x,y)) is not None:
-                    for n in nlist:
-                        npos = (x+n[0], y+n[1])
-                        if npos[0] >= len(D[0]) or npos[0] < 0 or npos[1] >= len(D) or npos[1] < 0:
-                            continue
-                        nmap[npos] = 1
-
-        counter = 0
-        for y in range(len(D)):
-            for x in range(len(D[0])):
-                value = nmap.get((x,y))
-                if value != 1 and value != 0:
-                    counter += 1
-        print((int)(counter/9))
-
-
-p1()
-p2()
+if __name__ == '__main__':
+    main()
