@@ -102,6 +102,7 @@ def p2():
             else:
                 bc = a[15:].split(',')
 
+        rx_root = None
         for i, a in enumerate(A):
             if a[0] == 'b':
                 continue
@@ -110,6 +111,8 @@ def p2():
             for target in mtarget:
                 tname = target.strip()
                 # print(f"name |{mname}|{tname}|")
+                if tname == 'rx':
+                    rx_root = mname
 
                 f = flops.get(tname)
                 this = flops.get(mname)
@@ -126,10 +129,12 @@ def p2():
 
         lh = [0,0]
         ts = []
-        xm_r = ("ft", "jz", "sv", "ng")
+
+        # xm_r = ("ft", "jz", "sv", "ng")
+        
         d = {}
-        for x in xm_r:
-            d[x] = []
+        for x, _ in flops[rx_root].roots:
+            d[str(x)] = []
 
         for i in range(15000):
             ts.append((None, bc, 0))
@@ -146,7 +151,7 @@ def p2():
                 if t1[0] is not None:
                     name = t1[0].name
 
-                if t1[1].name == "xm" and signal == 1:
+                if t1[1].name == rx_root and signal == 1:
                     d[t1[0].name].append(i)
 
                 # print(f"{name} -{low}-> {t1[1].name}")

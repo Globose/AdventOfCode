@@ -7,15 +7,13 @@ def hash_1(s):
     return c_val
 
 def p1():
+    A = []
     with open('2023/data/a15.txt', 'r', encoding='UTF-8') as file:
-        A = []
-        sum = 0
-        for s in file:
-            A.append(s)
-        A = A[0].split(",")
-        for a in A:
-            sum += hash_1(a)
-        print(sum)
+        A = [line.strip() for line in file][0].split(',')
+    sum = 0
+    for a in A:
+        sum += hash_1(a)
+    print(sum)
 
 def remove(D:list, label):
     for d in D:
