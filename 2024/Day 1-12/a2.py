@@ -22,7 +22,6 @@ def main():
     sc = 0
     for r in reps:
         if safe(r) == -1:
-            diffs = [r[i]-r[i-1] for i in range (1,len(r))]
             sc += 1
     print(sc)
 

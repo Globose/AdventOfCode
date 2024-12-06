@@ -10,16 +10,12 @@ s_help = [(1,'|'), (3,'-'), (5,'-'), (7,'|')]
 def part_2(A, start_pos, main_loop):
     ### Expand map
     new_map = []
-    added_dots = 0
-    total_dots = 0
     for y in range(len(A)):
         B = ['', '', '']
         for x in range(len(A[0])):
             key = A[y][x] if (x,y) in main_loop else '.'
             for i in range(3):
                 B[i] += sym[key][i*3:i*3+3]
-            added_dots += sym[key].count('.')-key.count('.')
-            total_dots += sym[key].count('.')
         new_map.extend(B)
 
     ### Try to visit all dots
