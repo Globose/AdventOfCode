@@ -11,7 +11,7 @@ def blink(d):
     return (d*2024,)
 
 
-def blink_r(d, depth, memo, dset, lim):
+def blink_r(d, depth, dset, lim):
     key = (d,depth)
     if key in dset:
         return dset.get(key)
@@ -21,7 +21,7 @@ def blink_r(d, depth, memo, dset, lim):
     
     size = 0
     for d2 in blink(d):
-        tsize = blink_r(d2, depth+1, memo, dset, lim)
+        tsize = blink_r(d2, depth+1, dset, lim)
         size += tsize
 
     dset[key] = size
@@ -30,11 +30,10 @@ def blink_r(d, depth, memo, dset, lim):
 
 def get_score(A, lim):
     dset = {}
-    memo = {}
     total = 0
 
     for a in A:
-        total += blink_r(a, 0, memo, dset, lim)
+        total += blink_r(a, 0, dset, lim)
     
     return total
     
