@@ -1,4 +1,5 @@
 import numpy as np
+import re
 
 def solve(v1, v2, sol):
     a1 = np.array([[v1[0], v2[0]],[v1[1], v2[1]]])
@@ -14,8 +15,6 @@ def solve(v1, v2, sol):
                 return (k1,k2)
     return None
 
-def get_num(a):
-    return int(a[2:])
 
 def main():
     A = []
@@ -25,11 +24,10 @@ def main():
     i = 0
     tokens = [0,0]
     while i < len(A):
-        a = A[i]
-        v1 = tuple([get_num(x) for x in A[i][10:].split(', ')])
-        v2 = tuple([get_num(x) for x in A[i+1][10:].split(', ')])
-        prize = tuple([get_num(x) for x in A[i+2][7:].split(', ')])
-
+        v1 = tuple([int(x) for x in re.findall(r"\d+", A[i])])
+        v2 = tuple([int(x) for x in re.findall(r"\d+", A[i+1])])
+        prize = tuple([int(x) for x in re.findall(r"\d+", A[i+2])])
+        
         ### part 1
         solved = solve(v1, v2, prize)
         if solved:
