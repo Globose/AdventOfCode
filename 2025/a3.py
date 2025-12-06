@@ -31,7 +31,7 @@ def main():
     with open('data/a3.txt', 'r', encoding='UTF-8') as file:
         A = [line.strip() for line in file]
 
-    # p1(A)
+    p1(A)
     p2(A)
     
 
